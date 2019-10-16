@@ -1,0 +1,6 @@
+CMakeCache.txt
+.vscode/
+CMakeFiles/
+Makefile
+cmake install.cmake
+scrapper
