@@ -2,5 +2,5 @@ CMakeCache.txt
 .vscode/
 CMakeFiles/
 Makefile
-cmake install.cmake
+cmake_install.cmake
 scrapper
