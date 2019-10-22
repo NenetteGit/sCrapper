@@ -108,7 +108,18 @@ void freeFirstActionFromList(Task* task) {
     }
 }
 
-void freeTask(Task*);
+void freeTaskFromList(TaskList* tasklist) {
+    if(tasklist->firstTask != NULL) {
+        Task* taskToDelete = tasklist->firstTask;
+        if(taskToDelete->name != NULL) free(taskToDelete->name);
+        while (taskToDelete->firstAction != NULL) {
+            freeFirstActionFromList(taskToDelete);
+        }
+        tasklist->firstTask = tasklist->firstTask->next;
+        free(taskToDelete);
+        tasklist->numberOfTasks--;        
+    }
+}
 
 void addNewOptionInList(Action* action, const char* key, const char* value) {
     Option* newOption = malloc(sizeof(Option));
@@ -131,10 +142,26 @@ void addNewActionInList(Task* task, const char* name, const char* url) {
     task->numberOfActions++;
 }
 
+void addNewEmptyActionInList(Task* task) {
+    Action* newAction = initializeAction();
+    if(task->firstAction == NULL || newAction == NULL) return;
+    newAction->next = task->firstAction;
+    task->firstAction = newAction;
+    task->numberOfActions++;
+}
+
 void addNewTaskInList(TaskList* taskList, const char* name, unsigned int hour, unsigned int minute) {
     Task* newTask = initializeTask();
     if(taskList->firstTask == NULL || newTask == NULL) return;
     setTask(newTask, name, hour, minute);
+    newTask->next = taskList->firstTask;
+    taskList->firstTask = newTask;
+    taskList->numberOfTasks++;
+}
+
+void addNewEmptyTaskInList(TaskList* taskList) {
+    Task* newTask = initializeTask();
+    if(taskList->firstTask == NULL || newTask == NULL) return;
     newTask->next = taskList->firstTask;
     taskList->firstTask = newTask;
     taskList->numberOfTasks++;
@@ -175,6 +202,41 @@ void displayTasksList(TaskList* taskList) {
     printf("\n");
 }
 
+char* extractDataFromConfigFile(const char* line, int parentSymbol) {
+    char endOfData = parentSymbol == NEW_ACTION ? ')' : '}';
+    int i = 1;
+    char* dest;
+    int subStringLength = 0;
+    while (line[i++] != endOfData) { 
+        subStringLength++;
+    }
+    dest = malloc(sizeof(char) * (subStringLength + 1));
+    strncpy(dest, line + 1, subStringLength);
+    dest[strlen(dest)] = '\0';
+    return dest;
+}
+
+char** splitOption(char* optionNotSplit, int parentSymbol) {
+    char* separator = parentSymbol == NEW_ACTION ? ",\0" : "->\0";
+    char** resultofSplit = malloc(sizeof(char*) * 5);
+    int index = 0;
+    char* firstFind;
+    char* ptr = optionNotSplit;
+    while((firstFind = strstr(ptr, separator)) != NULL) {
+        int size = firstFind - optionNotSplit;
+        resultofSplit[index] = malloc(sizeof(char) * size + 1);
+        strncpy(resultofSplit[index], ptr, size);
+        ptr += (parentSymbol == NEW_ACTION) ? size + 1 : size + 2;
+        index++;
+    }
+    resultofSplit[index] = malloc(sizeof(char) * (strlen(ptr) + 1));
+    strcpy(resultofSplit[index], ptr);
+    for(int i = 0; i <= index; i++) {
+        printf("\n%s\n", resultofSplit[i]);        
+    }
+    return NULL;
+}
+
 Action* initializeAction() {
     Action* action = malloc(sizeof(Action));
     Option* option = malloc(sizeof(Option));
@@ -197,4 +259,26 @@ Task* initializeTask() {
     task->firstAction = action;
     task->next = NULL;
     return task;
+}
+
+int initialize(TaskList* tasksList, Task* actionsList, int symbolParent) {
+    switch (symbolParent) {
+        case TASK:
+            if(tasksList->firstTask == NULL) {
+                tasksList->firstTask = initializeTask();
+            } else {
+                addNewEmptyTaskInList(tasksList);
+            }
+            break;
+        case ACTION:
+            if(actionsList->firstAction == NULL) {
+                actionsList->firstAction = initializeAction();
+            } else {
+                addNewEmptyActionInList(actionsList);
+            }
+            break;         
+        default:
+            return 0;
+    }
+    return 1;
 }

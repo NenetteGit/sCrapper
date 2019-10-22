@@ -1,4 +1,15 @@
-enum symbol { COMMENT, OPTION, ACTION, TASK, DATA };
+enum symbol { 
+    COMMENT,
+    OPTION,
+    ACTION, 
+    TASK, 
+    DATA,
+    DATA_TASK, 
+    DATA_ACTION, 
+    NEW_OPTION, 
+    NEW_ACTION,
+    NEW_TASK 
+};
 
 typedef struct Option Option;
 typedef struct Action Action;
@@ -60,11 +71,17 @@ void freeFirstOptionFromList(Action*);
 
 void freeFirstActionFromList(Task*);
 
-void freeTask(Task*);
+void freeTaskFromList(TaskList*);
 
 void addNewOptionInList(Action*, const char*, const char*);
 
 void addNewActionInList(Task*, const char*, const char*);
+
+void addNewEmptyOptionInList(Task*);
+
+void addNewEmptyActionInList(Task*);
+
+void addNewEmptyTaskInList(TaskList*);
 
 void addNewTaskInList(TaskList*, const char*, unsigned int, unsigned int);
 
@@ -76,7 +93,12 @@ void displayTasksList(TaskList*);
 
 //void setSecondOfTask(Task*, unsigned int); // to do when subject fixed with teachers
 
+char* extractDataFromConfigFile(const char*, int);
+
+char** splitOption(char*, int);
+
 Action* initializeAction();
 
 Task* initializeTask();
 
+int initialize(TaskList*, Task*, int);
