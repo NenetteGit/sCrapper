@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "headers/structures.h"
 
 void setOption(Option* option, const char* key, const char* value) {
@@ -26,26 +27,28 @@ void setValueOfOption(Option* option, const char* value) {
     }
 }
 
-void setAction(Action* action, const char* name, const char* url) {
-    setNameOfAction(action, name);
-    setUrlTargetOfAction(action, url);
+void setAction(Task* actionList, const char* name, const char* url) {
+    setNameOfAction(actionList, name);
+    setUrlTargetOfAction(actionList, url);
 }
 
-void setUrlTargetOfAction(Action* action, const char* url) {
+void setUrlTargetOfAction(Task* actionList, const char* url) {
     if(strlen(url) > 0) {
-        action->url = malloc(sizeof(char) * (strlen(url) + 1));
-        if(action->url == NULL) return;
-        strcpy(action->url, url);
-        action->url[strlen(url)] = '\0';
+        actionList->firstAction->url = malloc(sizeof(char) * (strlen(url) + 1));
+        if(actionList->firstAction->url == NULL) return;
+        strcpy(actionList->firstAction->url, url);
+        actionList->firstAction->url[strlen(url)] = '\0';
     }
 }
 
-void setNameOfAction(Action* action, const char* name) {
-    if(strlen(name) > 0) {
-        action->name = malloc(sizeof(char) * (strlen(name) + 1));
-        if(action->name == NULL) return;
-        strcpy(action->name, name);
-        action->name[strlen(name)] = '\0';
+void setNameOfAction(Task* actionsList, const char* name) {
+    if(strlen(name) > 0 && actionsList != NULL) {
+        printf("test\n");
+        actionsList->firstAction->name = malloc(sizeof(char) * (strlen(name) + 1));
+        if(actionsList->firstAction->name == NULL) return;
+        
+        strcpy(actionsList->firstAction->name, name);
+        actionsList->firstAction->name[strlen(name)] = '\0';
     }
 }
 
@@ -133,14 +136,14 @@ void addNewOptionInList(Action* action, const char* key, const char* value) {
     action->numberOfOptions++;
 }
 
-void addNewActionInList(Task* task, const char* name, const char* url) {
-    Action* newAction = initializeAction();
-    if(task->firstAction == NULL || newAction == NULL) return;
-    setAction(newAction, name, url);
-    newAction->next = task->firstAction;
-    task->firstAction = newAction;
-    task->numberOfActions++;
-}
+// void addNewActionInList(Task* task, const char* name, const char* url) {
+//     Action* newAction = initializeAction();
+//     if(task->firstAction == NULL || newAction == NULL) return;
+//     setAction(newAction, name, url);
+//     newAction->next = task->firstAction;
+//     task->firstAction = newAction;
+//     task->numberOfActions++;
+// }
 
 void addNewEmptyActionInList(Task* task) {
     Action* newAction = initializeAction();
@@ -205,18 +208,19 @@ void displayTasksList(TaskList* taskList) {
 char* extractDataFromConfigFile(const char* line, int parentSymbol) {
     char endOfData = parentSymbol == NEW_ACTION ? ')' : '}';
     int i = 1;
-    char* dest;
+    char* substr;
     int subStringLength = 0;
     while (line[i++] != endOfData) { 
         subStringLength++;
     }
-    dest = malloc(sizeof(char) * (subStringLength + 1));
-    strncpy(dest, line + 1, subStringLength);
-    dest[strlen(dest)] = '\0';
-    return dest;
+    substr = malloc(sizeof(char) * (subStringLength + 1));
+    if (substr == NULL) return NULL;
+    strncpy(substr, line + 1, subStringLength);
+    substr[strlen(substr)] = '\0';
+    return substr;
 }
 
-char** splitOption(char* optionNotSplit, int parentSymbol) {
+char** splitOption(char* optionNotSplit, int parentSymbol, int* numberOfOptions) {
     char* separator = parentSymbol == NEW_ACTION ? ",\0" : "->\0";
     char** resultofSplit = malloc(sizeof(char*) * 5);
     int index = 0;
@@ -230,10 +234,39 @@ char** splitOption(char* optionNotSplit, int parentSymbol) {
         index++;
     }
     resultofSplit[index] = malloc(sizeof(char) * (strlen(ptr) + 1));
-    strcpy(resultofSplit[index], ptr);
-    for(int i = 0; i <= index; i++) {
-        printf("\n%s\n", resultofSplit[i]);        
+    strcpy(resultofSplit[index++], ptr);
+    *numberOfOptions = index;
+    return resultofSplit;
+}
+
+char* trim(const char* input) {
+    char* newString = malloc(sizeof(char) * (strlen(input) + 1));
+    if (newString == NULL) return NULL;
+    strcpy(newString, input);
+    char tmp;
+    if(isspace(newString[0])) {
+        for (int i = 0; i < strlen(input) - 1; i++) {
+            tmp = newString[i];
+            newString[i] = newString[i+1];
+            newString[i+1] = tmp;
+        }
     }
+    newString[strlen(newString) - 1] = '\0';
+    // if(isspace(newString[strlen(newString) - 1])) newString[strlen(newString) - 1] = '\0';
+    return newString;
+}
+
+Action* findActionByNameInList(Task* actionsList, const char* haystack) {
+    printf("\n %s\n", actionsList->firstAction->name);
+    // Action* a = malloc(sizeof(Action));
+    // a = actionsList->firstAction;
+    // while (a != NULL) {
+    //     if(strcmp(a->name, haystack) == 0) {
+    //         printf("\n %s \n", a->name);
+    //         return a;
+    //     }
+    //     a = a->next;
+    // }
     return NULL;
 }
 
@@ -261,24 +294,35 @@ Task* initializeTask() {
     return task;
 }
 
+TaskList* initializeTaskList() {
+    TaskList* taskList = malloc(sizeof(TaskList));
+    Task* task = initializeTask();
+    if(taskList == NULL || task == NULL) return NULL;
+    taskList->numberOfTasks = 0;
+    taskList->firstTask = task;
+    return taskList;
+}
+
 int initialize(TaskList* tasksList, Task* actionsList, int symbolParent) {
     switch (symbolParent) {
         case TASK:
-            if(tasksList->firstTask == NULL) {
-                tasksList->firstTask = initializeTask();
+            if(tasksList == NULL) {
+                tasksList = initializeTaskList();
             } else {
                 addNewEmptyTaskInList(tasksList);
             }
             break;
         case ACTION:
-            if(actionsList->firstAction == NULL) {
-                actionsList->firstAction = initializeAction();
+            if(actionsList == NULL) {
+                // printf("test 1\n");
+                actionsList = initializeTask();
+                if(actionsList == NULL) printf("action list is null\n");
             } else {
                 addNewEmptyActionInList(actionsList);
             }
             break;         
         default:
-            return 0;
+            return 1;
     }
-    return 1;
+    return 0;
 }

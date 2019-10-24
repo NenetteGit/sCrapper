@@ -51,11 +51,11 @@ void setKeyOfOption(Option*, const char*);
 
 void setValueOfOption(Option*, const char*);
 
-void setAction(Action*, const char*, const char*);
+void setAction(Task*, const char*, const char*);
 
-void setNameOfAction(Action*, const char*);
+void setNameOfAction(Task*, const char*);
 
-void setUrlTargetOfAction(Action*, const char*);
+void setUrlTargetOfAction(Task*, const char*);
 
 void setTask(Task*, const char*, unsigned int, unsigned int);
 
@@ -95,10 +95,16 @@ void displayTasksList(TaskList*);
 
 char* extractDataFromConfigFile(const char*, int);
 
-char** splitOption(char*, int);
+char** splitOption(char*, int, int*);
+
+char* trim(const char*);
+
+Action* findActionByNameInList(Task*, const char*);
 
 Action* initializeAction();
 
 Task* initializeTask();
+
+TaskList* initializeTaskList();
 
 int initialize(TaskList*, Task*, int);

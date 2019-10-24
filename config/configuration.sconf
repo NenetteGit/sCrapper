@@ -1,6 +1,6 @@
 =
 {name -> Mon site web}  #Correspond au nom de vôtre action
-{url -> value}          # URL du site à récupérer
+{url -> https://www.google.fr}          # URL du site à récupérer
 +
 {max-depth -> 3}
 {option -> value}
