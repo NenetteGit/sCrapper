@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(scrapper)
 
 set(CURL_LIBRARY "-lcurl") 
+set(PTHREAD_LIBRARY "-lpthread")
 set (HEADERS headers/structures.h)
 set(SRCS src/scrapper.c src/structures.c)
 # set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/headers)
@@ -21,7 +22,13 @@ set(SRCS src/scrapper.c src/structures.c)
 # include_directories(${INCLUDE_DIR})
 
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+# find_package(Threads REQUIRED)
+# target_link_libraries(my_app Threads::Threads)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+find_package(Threads REQUIRED)
 
 find_package(CURL REQUIRED) 
 
@@ -31,4 +38,4 @@ include_directories(${CURL_INCLUDE_DIR})
 
 
 
-target_link_libraries(scrapper ${CURL_LIBRARIES})
+target_link_libraries(scrapper ${CURL_LIBRARIES} Threads::Threads)

@@ -1,4 +1,5 @@
 =
+# fdhfhdfdjfh
 {name -> Mon site web}  #Correspond au nom de vôtre action
 {url -> https://www.google.fr}          # URL du site à récupérer
 +
@@ -13,12 +14,6 @@
 {option -> value}            # Listes des options au format { KEY -> VALUE}
 {option -> value}
 
-==
-{name -> Ma super tâche}
-{second -> 10}         # Lance les deux requêtes HTTP toutes les 10 secondes
-+
-(Mon site web, Mon deuxième site)
-
 == # Lance la requête HTTP toutes les 2 minutes et 10 secondes
 {name -> Ma tâche facile}
 {minute -> 2}
@@ -28,7 +23,13 @@
 
 ==
 # Lance la requête HTTP toutes les 6 heures
-{name -> Ma tâche facile}
+{name -> Ma deuxième tâche facile}
 {hour-> 6}
 +
 (Mon deuxième site)
+
+==
+{name -> Ma super tâche}
+{second -> 10}         # Lance les deux requêtes HTTP toutes les 10 secondes
++
+(Mon site web, Mon deuxième site)

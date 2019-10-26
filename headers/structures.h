@@ -99,7 +99,15 @@ char** splitOption(char*, int, int*);
 
 char* trim(const char*);
 
+void addCopyActionToList(Task*, Action*);
+
+Action* unreferencedCopyAction(Action*);
+
+int isAlpha(const char);
+
 Action* findActionByNameInList(Task*, const char*);
+
+Option* initializeOption();
 
 Action* initializeAction();
 
@@ -107,4 +115,4 @@ Task* initializeTask();
 
 TaskList* initializeTaskList();
 
-int initialize(TaskList*, Task*, int);
+int initialize(TaskList**, Task**, int);

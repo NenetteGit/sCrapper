@@ -42,8 +42,10 @@ void setUrlTargetOfAction(Task* actionList, const char* url) {
 }
 
 void setNameOfAction(Task* actionsList, const char* name) {
-    if(strlen(name) > 0 && actionsList != NULL) {
-        printf("test\n");
+    printf("test strlen of name: %ld \n", strlen(name));
+    if(strlen(name) > 0) {
+        // && actionsList != NULL
+        printf("test test \n");
         actionsList->firstAction->name = malloc(sizeof(char) * (strlen(name) + 1));
         if(actionsList->firstAction->name == NULL) return;
         
@@ -239,42 +241,59 @@ char** splitOption(char* optionNotSplit, int parentSymbol, int* numberOfOptions)
     return resultofSplit;
 }
 
+int isAlpha(const char c) {
+    return (tolower(c) >= 'a' && tolower(c) <= 'z') ? 1 : 0;
+}
+
 char* trim(const char* input) {
-    char* newString = malloc(sizeof(char) * (strlen(input) + 1));
-    if (newString == NULL) return NULL;
-    strcpy(newString, input);
-    char tmp;
-    if(isspace(newString[0])) {
-        for (int i = 0; i < strlen(input) - 1; i++) {
-            tmp = newString[i];
-            newString[i] = newString[i+1];
-            newString[i+1] = tmp;
-        }
+    char* output = calloc(sizeof(char), strlen(input) + 1);
+    strcpy(output, input + (isspace(input[0]) ? 1 : 0));    
+    for (int i = strlen(output) - 1; i >= 0 && isspace(output[i]) ; i--) {
+        output[i] = '\0';
     }
-    newString[strlen(newString) - 1] = '\0';
-    // if(isspace(newString[strlen(newString) - 1])) newString[strlen(newString) - 1] = '\0';
-    return newString;
+    return output;
+}
+
+Action* unreferencedCopyAction(Action* actionToCopy) {
+    Action* a = malloc(sizeof(Action));
+    a->name = actionToCopy->name;
+    a->url = actionToCopy->url;
+    a->firstOption = actionToCopy->firstOption;
+    a->next = NULL;
+    return a;
+}
+
+void addCopyActionToList(Task* actionsList, Action* action) {
+    action->next = actionsList->firstAction;
+    actionsList->firstAction = action;
+    actionsList->numberOfActions++;
 }
 
 Action* findActionByNameInList(Task* actionsList, const char* haystack) {
-    printf("\n %s\n", actionsList->firstAction->name);
-    // Action* a = malloc(sizeof(Action));
-    // a = actionsList->firstAction;
-    // while (a != NULL) {
-    //     if(strcmp(a->name, haystack) == 0) {
-    //         printf("\n %s \n", a->name);
-    //         return a;
-    //     }
-    //     a = a->next;
-    // }
+    Action* a = actionsList->firstAction;
+    while (a != NULL) {
+        // printf("\nhaystack : %s\n", haystack);
+        if(strcmp(a->name, haystack) == 0) {
+            // printf("\n %s \n", a->name);
+            return a;
+        }
+        a = a->next;
+    }
     return NULL;
+}
+
+Option* initializeOption() {
+    Option* option = malloc(sizeof(Option));
+    if (option == NULL) return NULL;
+    option->next = NULL;
+    return option;
 }
 
 Action* initializeAction() {
     Action* action = malloc(sizeof(Action));
-    Option* option = malloc(sizeof(Option));
+    Option* option = initializeOption();
     if(action == NULL || option == NULL) return NULL;
-    option->next = NULL;
+    // option->next = NULL;
     action->numberOfOptions = 0;
     action->firstOption = option;
     action->next = NULL;
@@ -303,24 +322,22 @@ TaskList* initializeTaskList() {
     return taskList;
 }
 
-int initialize(TaskList* tasksList, Task* actionsList, int symbolParent) {
+int initialize(TaskList** tasksList, Task** actionsList, int symbolParent) {
     switch (symbolParent) {
         case TASK:
-            if(tasksList == NULL) {
-                tasksList = initializeTaskList();
+            if(*tasksList == NULL) {
+                *tasksList = initializeTaskList();
             } else {
-                addNewEmptyTaskInList(tasksList);
+                addNewEmptyTaskInList(*tasksList);
             }
             break;
         case ACTION:
-            if(actionsList == NULL) {
-                // printf("test 1\n");
-                actionsList = initializeTask();
-                if(actionsList == NULL) printf("action list is null\n");
+            if(*actionsList == NULL) {
+                *actionsList = initializeTask();
             } else {
-                addNewEmptyActionInList(actionsList);
+                addNewEmptyActionInList(*actionsList);
             }
-            break;         
+            break;        
         default:
             return 1;
     }
