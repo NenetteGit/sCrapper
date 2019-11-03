@@ -6,9 +6,9 @@ set(CURL_LIBRARY "-lcurl")
 
 set(PTHREAD_LIBRARY "-lpthread")
 
-set (HEADERS headers/structures.h)
+set (HEADERS headers/structures.h headers/sniff.h)
 
-set(SRCS src/scrapper.c src/structures.c)
+set(SRCS src/scrapper.c src/structures.c src/sniff.c)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 

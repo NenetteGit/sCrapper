@@ -5,7 +5,8 @@
 #include <curl/curl.h>
 #include <string.h>
 #include <unistd.h>
-#include "headers/structures.h"
+#include <headers/structures.h>
+#include <headers/sniff.h>
 
 int main(int argc, char** argv) {
     TaskList* tasksList = NULL;
@@ -15,7 +16,8 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
     tasksList = getTasksListFromConfigFile(argv[1]);
-    displayTasksList(tasksList);
+    //displayTasksList(tasksList);
+    test(tasksList);
 
     // freeTaskFromList(tasksList);
 

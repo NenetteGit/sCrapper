@@ -1,3 +1,8 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
+#include <stdio.h>
+
 enum symbol { 
     COMMENT,
     OPTION,
@@ -126,3 +131,5 @@ void checkSymbolParent(const char*, int*);
 size_t write_data(void*, size_t, size_t, FILE*);
 
 int checkSymbolOption(const char*, int);
+
+#endif
