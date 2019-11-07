@@ -2,6 +2,7 @@
 #define STRUCTURES_H
 
 #include <stdio.h>
+#include <ctype.h>
 
 enum symbol { 
     COMMENT,
@@ -127,8 +128,6 @@ int initialize(TaskList**, Task**, int);
 TaskList* getTasksListFromConfigFile(const char*);
 
 void checkSymbolParent(const char*, int*);
-
-size_t write_data(void*, size_t, size_t, FILE*);
 
 int checkSymbolOption(const char*, int);
 
