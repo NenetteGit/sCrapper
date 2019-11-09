@@ -1,17 +1,3 @@
-=
-{name -> Mon deuxième site}  # Correspond au nom de vôtre deuxième action
-{url -> https://stackoverflow.com}               # URL du site à récupérer
-+
-{max-depth -> 0}            # Listes des options au format { KEY -> VALUE}
-{versioning -> off}
-
-=
-{name -> Mon site web}  #Correspond au nom de vôtre action
-{url -> https://www.google.fr}          # URL du site à récupérer
-+
-{max-depth -> 3}
-{versioning -> on}
-{type -> img/png}
 
 == # Lance la requête HTTP toutes les 2 minutes et 10 secondes
 {name -> Ma tâche facile}
@@ -33,3 +19,17 @@
 +
 (Mon site web, Mon deuxième site)
 
+=
+{name -> Mon site web}  #Correspond au nom de vôtre action
+{url -> https://www.google.fr}          # URL du site à récupérer
++
+{max-depth -> 3}
+{versioning -> on}
+{type -> img/png}
+
+=
+{name -> Mon deuxième site}  # Correspond au nom de vôtre deuxième action
+{url -> https://stackoverflow.com}               # URL du site à récupérer
++
+{max-depth -> 0}            # Listes des options au format { KEY -> VALUE}
+{versioning -> off}

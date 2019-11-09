@@ -477,6 +477,11 @@ TaskList *getTasksListFromConfigFile(const char *filename)
     Task *actionsList = NULL;
     int symbolParent = -1;
     FILE *configFile;
+    int index = 0;
+    char ***temporaryListOfActionsNamePerTask = malloc(sizeof(char **) * 10);
+    int *temporaryNumberOfActionPerTask = malloc(sizeof(int) * 10);
+    if (temporaryListOfActionsNamePerTask == NULL || temporaryNumberOfActionPerTask == NULL)
+        return NULL;
 
     configFile = fopen(filename, "r");
     if (configFile == NULL)
@@ -544,36 +549,30 @@ TaskList *getTasksListFromConfigFile(const char *filename)
                 }
                 else if (optionType == NEW_ACTION)
                 {
-                    for (int i = 0; i < numberOfOptions; i++)
-                    {
-                        Action *action = findActionByNameInList(actionsList, options[i]);
-                        if (action != NULL)
-                        {
-                            addCopyActionToList(tasksList->firstTask, unreferencedCopyAction(action));
-                        }
-                    }
+                    temporaryListOfActionsNamePerTask[index] = options;
+                    temporaryNumberOfActionPerTask[index] = numberOfOptions;
+                    index++;
                 }
             }
         }
     }
     fclose(configFile);
-    // Task *tmp = tasksList->firstTask;
 
-    // while(tmp != NULL) 
-    // {   Action* tmpA = tmp->firstAction;
-    //     while (tmpA != NULL)
-    //     {
-    //         Action *searchedAction = findActionByNameInList(actionsList, tmpA->name);
-    //         if (searchedAction != NULL)
-    //         {
-    //             Action *action = unreferencedCopyAction(searchedAction);
-    //             tmpA = 
-    //             addCopyActionToList(tmp, unreferencedCopyAction(searchedAction));
-    //         }
-    //         tmpA = tmpA->next;
-    //     }
-    //     tmp = tmp->next;
-    // }
+    Task *tmp = tasksList->firstTask;
+    for (int i = index - 1; i >= 0; i--)
+    {
+        for (int j = temporaryNumberOfActionPerTask[i] - 1; j >= 0; j--)
+        {
+            Action *searchedAction = findActionByNameInList(actionsList, temporaryListOfActionsNamePerTask[i][j]);
+            if (searchedAction != NULL)
+            {
+                addCopyActionToList(tmp, unreferencedCopyAction(searchedAction));
+            }
+        }
+        tmp = tmp->next;
+    }
+
+    free(tmp);
 
     return tasksList;
 }
