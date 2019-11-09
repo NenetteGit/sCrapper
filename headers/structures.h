@@ -4,17 +4,18 @@
 #include <stdio.h>
 #include <ctype.h>
 
-enum symbol { 
+enum symbol
+{
     COMMENT,
     OPTION,
-    ACTION, 
-    TASK, 
+    ACTION,
+    TASK,
     DATA,
-    DATA_TASK, 
-    DATA_ACTION, 
-    NEW_OPTION, 
+    DATA_TASK,
+    DATA_ACTION,
+    NEW_OPTION,
     NEW_ACTION,
-    NEW_TASK 
+    NEW_TASK
 };
 
 typedef struct Option Option;
@@ -22,113 +23,127 @@ typedef struct Action Action;
 typedef struct Task Task;
 typedef struct TaskList TaskList;
 
-struct Option {
-    char* key;
-    char* value;
-    Option* next;
+struct Option
+{
+    char *key;
+    char *value;
+    Option *next;
 };
 
-struct Action {
-    char* name;
-    char* url;
-    Option* firstOption;
+struct Action
+{
+    char *name;
+    char *url;
+    Option *firstOption;
     unsigned int numberOfOptions;
-    Action* next;
+    Action *next;
 };
 
-struct Task {
-    char* name;
+struct Task
+{
+    char *name;
     unsigned int hour;
     unsigned int minute;
     unsigned int second;
-    Action* firstAction;
+    Action *firstAction;
     unsigned int numberOfActions;
-    Task* next;
+    Task *next;
 };
 
-struct TaskList {
-    Task* firstTask;
+struct TaskList
+{
+    Task *firstTask;
     unsigned numberOfTasks;
 };
 
-void setOption(Option*, const char*, const char*);
+void setAllActionsInAllTasks(TaskList *, Task *, int, char ***, int *);
 
-void setKeyOfOption(Option*, const char*);
+int prepareDataFromConfigFile(FILE *, TaskList **, Task **, char ***, int *);
 
-void setValueOfOption(Option*, const char*);
+void prepareActionData(Task *, char **);
 
-void setAction(Task*, const char*, const char*);
+void prepareTaskData(TaskList *, char **);
 
-void setNameOfAction(Task*, const char*);
+void initializeTaskOrAction(TaskList **, Task **, int *, const char *);
 
-void setUrlTargetOfAction(Task*, const char*);
+void setOption(Option *, const char *, const char *);
 
-void setTask(Task*, const char*, unsigned int, unsigned int);
+void setKeyOfOption(Option *, const char *);
 
-void setNameOfTask(Task*, const char*);
+void setValueOfOption(Option *, const char *);
 
-void setTimeOfTask(Task*, unsigned int, unsigned int);
+void setAction(Task *, const char *, const char *);
 
-void setHourOfTask(Task*, const char*);
+void setNameOfAction(Task *, const char *);
 
-void setMinuteOfTask(Task*, const char*);
+void setUrlTargetOfAction(Task *, const char *);
 
-void setSecondOfTask(Task*, const char*);
+void setTask(Task *, const char *, unsigned int, unsigned int);
 
-void freeFirstOptionFromList(Action*);
+void setNameOfTask(Task *, const char *);
 
-void freeFirstActionFromList(Task*);
+void setTimeOfTask(Task *, unsigned int, unsigned int);
 
-void freeTask(Task**);
+void setHourOfTask(Task *, const char *);
 
-void freeTaskFromList(TaskList*);
+void setMinuteOfTask(Task *, const char *);
 
-void addNewOptionInList(Action*, const char*, const char*);
+void setSecondOfTask(Task *, const char *);
 
-void addNewActionInList(Task*, const char*, const char*);
+void freeFirstOptionFromList(Action *);
 
-void addNewEmptyOptionInList(Task*);
+void freeFirstActionFromList(Task *);
 
-void addNewEmptyActionInList(Task*);
+void freeTask(Task **);
 
-void addNewEmptyTaskInList(TaskList*);
+void freeTaskFromList(TaskList *);
 
-void addNewTaskInList(TaskList*, const char*, unsigned int, unsigned int);
+void addNewOptionInList(Action *, const char *, const char *);
 
-void displayOptionsList(Action*);
+void addNewActionInList(Task *, const char *, const char *);
 
-void displayActionsList(Task*);
+void addNewEmptyOptionInList(Task *);
 
-void displayTasksList(TaskList*);
+void addNewEmptyActionInList(Task *);
 
-char* extractDataFromConfigFile(const char*, int);
+void addNewEmptyTaskInList(TaskList *);
 
-char** splitOption(char*, int, int*);
+void addNewTaskInList(TaskList *, const char *, unsigned int, unsigned int);
 
-char* trim(const char*);
+void displayOptionsList(Action *);
 
-void addCopyActionToList(Task*, Action*);
+void displayActionsList(Task *);
 
-Action* unreferencedCopyAction(Action*);
+void displayTasksList(TaskList *);
+
+char *extractDataFromConfigFile(const char *, int);
+
+char **splitOption(char *, int, int *);
+
+char *trim(const char *);
+
+void addCopyActionToList(Task *, Action *);
+
+Action *unreferencedCopyAction(Action *);
 
 int isAlpha(const char);
 
-Action* findActionByNameInList(Task*, const char*);
+Action *findActionByNameInList(Task *, const char *);
 
-Option* initializeOption();
+Option *initializeOption();
 
-Action* initializeAction();
+Action *initializeAction();
 
-Task* initializeTask();
+Task *initializeTask();
 
-TaskList* initializeTaskList();
+TaskList *initializeTaskList();
 
-int initialize(TaskList**, Task**, int);
+int initialize(TaskList **, Task **, int);
 
-TaskList* getTasksListFromConfigFile(const char*);
+TaskList *getTasksListFromConfigFile(const char *);
 
-void checkSymbolParent(const char*, int*);
+void checkSymbolParent(const char *, int *);
 
-int checkSymbolOption(const char*, int);
+int checkSymbolOption(const char *, int);
 
 #endif

@@ -470,16 +470,14 @@ void checkSymbolParent(const char *line, int *parentSymbol)
 
 TaskList *getTasksListFromConfigFile(const char *filename)
 {
-    ssize_t read = 0;
-    char *line = NULL;
-    size_t length = 0;
     TaskList *tasksList = NULL;
     Task *actionsList = NULL;
-    int symbolParent = -1;
+
     FILE *configFile;
-    int index = 0;
+
     char ***temporaryListOfActionsNamePerTask = malloc(sizeof(char **) * 10);
     int *temporaryNumberOfActionPerTask = malloc(sizeof(int) * 10);
+
     if (temporaryListOfActionsNamePerTask == NULL || temporaryNumberOfActionPerTask == NULL)
         return NULL;
 
@@ -489,75 +487,16 @@ TaskList *getTasksListFromConfigFile(const char *filename)
         printf("Config file could not have been opened.\n");
         return NULL;
     }
-
-    while ((read = getline(&line, &length, configFile)) != -1)
-    {
-        if (line[0] == '#')
-        {
-            continue;
-        }
-        else if (line[0] != '{' && line[0] != '(')
-        {
-            checkSymbolParent(line, &symbolParent);
-            if (symbolParent == TASK || symbolParent == ACTION)
-            {
-                int isInitialized = initialize(&tasksList, &actionsList, symbolParent);
-                if (isInitialized != 0)
-                {
-                    printf("\nelement not initialized\n");
-                    return NULL;
-                }
-            }
-        }
-        else
-        {
-            int optionType = checkSymbolOption(line, symbolParent);
-            if (optionType != -1)
-            {
-                char *substr = extractDataFromConfigFile(line, optionType);
-                if (substr == NULL)
-                    return NULL;
-                int numberOfOptions = 0;
-                char **options = splitOption(substr, optionType, &numberOfOptions);
-                if (optionType == DATA_ACTION)
-                {
-                    if (strcmp(options[0], "name") == 0)
-                        setNameOfAction(actionsList, options[1]);
-                    else if (strcmp(options[0], "url") == 0)
-                        setUrlTargetOfAction(actionsList, options[1]);
-                }
-                else if (optionType == DATA_TASK)
-                {
-                    if (strcmp(options[0], "name") == 0)
-                        setNameOfTask(tasksList->firstTask, options[1]);
-                    else if (strcmp(options[0], "hour") == 0)
-                        setHourOfTask(tasksList->firstTask, options[1]);
-                    else if (strcmp(options[0], "minute") == 0)
-                        setMinuteOfTask(tasksList->firstTask, options[1]);
-                    else if (strcmp(options[0], "second") == 0)
-                        setSecondOfTask(tasksList->firstTask, options[1]);
-                }
-                else if (optionType == NEW_OPTION)
-                {
-                    if (actionsList->firstAction->numberOfOptions == 0)
-                    {
-                        setOption(actionsList->firstAction->firstOption, options[0], options[1]);
-                        actionsList->firstAction->numberOfOptions += 1;
-                    }
-                    else
-                        addNewOptionInList(actionsList->firstAction, options[0], options[1]);
-                }
-                else if (optionType == NEW_ACTION)
-                {
-                    temporaryListOfActionsNamePerTask[index] = options;
-                    temporaryNumberOfActionPerTask[index] = numberOfOptions;
-                    index++;
-                }
-            }
-        }
-    }
+    int index = prepareDataFromConfigFile(configFile, &tasksList, &actionsList, temporaryListOfActionsNamePerTask, temporaryNumberOfActionPerTask);
     fclose(configFile);
 
+    setAllActionsInAllTasks(tasksList, actionsList, index, temporaryListOfActionsNamePerTask, temporaryNumberOfActionPerTask);
+
+    return tasksList;
+}
+
+void setAllActionsInAllTasks(TaskList *tasksList, Task *actionsList, int index, char ***temporaryListOfActionsNamePerTask, int *temporaryNumberOfActionPerTask)
+{
     Task *tmp = tasksList->firstTask;
     for (int i = index - 1; i >= 0; i--)
     {
@@ -573,6 +512,108 @@ TaskList *getTasksListFromConfigFile(const char *filename)
     }
 
     free(tmp);
+}
 
-    return tasksList;
+void initializeTaskOrAction(TaskList **tasksList, Task **actionsList, int *symbolParent, const char *line)
+{
+    checkSymbolParent(line, symbolParent);
+    if (*symbolParent == TASK || *symbolParent == ACTION)
+    {
+        int isInitialized = initialize(tasksList, actionsList, *symbolParent);
+        if (isInitialized != 0)
+        {
+            printf("\nelement not initialized\n");
+            exit(1);
+        }
+    }
+}
+
+void prepareTaskData(TaskList *tasksList, char **data)
+{
+    if (strcmp(data[0], "name") == 0)
+    {
+        setNameOfTask(tasksList->firstTask, data[1]);
+    }
+    else if (strcmp(data[0], "hour") == 0)
+    {
+        setHourOfTask(tasksList->firstTask, data[1]);
+    }
+    else if (strcmp(data[0], "minute") == 0)
+    {
+        setMinuteOfTask(tasksList->firstTask, data[1]);
+    }
+    else if (strcmp(data[0], "second") == 0)
+    {
+        setSecondOfTask(tasksList->firstTask, data[1]);
+    }
+}
+
+void prepareActionData(Task *actionsList, char **data)
+{
+    if (strcmp(data[0], "name") == 0)
+    {
+        setNameOfAction(actionsList, data[1]);
+    }
+    else if (strcmp(data[0], "url") == 0)
+    {
+        setUrlTargetOfAction(actionsList, data[1]);
+    }
+}
+
+int prepareDataFromConfigFile(FILE *configFile, TaskList **tasksList, Task **actionsList, char ***temporaryListOfActionsNamePerTask, int *temporaryNumberOfActionPerTask)
+{
+    ssize_t read = 0;
+    char *line = NULL;
+    size_t length = 0;
+    int symbolParent = -1;
+    int index = 0;
+
+    while ((read = getline(&line, &length, configFile)) != -1)
+    {
+        if (line[0] == '#')
+        {
+            continue;
+        }
+        else if (line[0] != '{' && line[0] != '(')
+        {
+            initializeTaskOrAction(tasksList, actionsList, &symbolParent, line);
+        }
+        else
+        {
+            int optionType = checkSymbolOption(line, symbolParent);
+            if (optionType != -1)
+            {
+                char *substr = extractDataFromConfigFile(line, optionType);
+                if (substr == NULL)
+                    continue;
+                int numberOfOptions = 0;
+                char **options = splitOption(substr, optionType, &numberOfOptions);
+                if (optionType == DATA_ACTION)
+                {
+                    prepareActionData(*actionsList, options);
+                }
+                else if (optionType == DATA_TASK)
+                {
+                    prepareTaskData(*tasksList, options);
+                }
+                else if (optionType == NEW_OPTION)
+                {
+                    if ((*actionsList)->firstAction->numberOfOptions == 0)
+                    {
+                        setOption((*actionsList)->firstAction->firstOption, options[0], options[1]);
+                        (*actionsList)->firstAction->numberOfOptions += 1;
+                    }
+                    else
+                        addNewOptionInList((*actionsList)->firstAction, options[0], options[1]);
+                }
+                else if (optionType == NEW_ACTION)
+                {
+                    temporaryListOfActionsNamePerTask[index] = options;
+                    temporaryNumberOfActionPerTask[index] = numberOfOptions;
+                    index++;
+                }
+            }
+        }
+    }
+    return index;
 }
