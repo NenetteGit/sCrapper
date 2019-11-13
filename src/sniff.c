@@ -1,29 +1,35 @@
 #include "headers/sniff.h"
 #include "headers/structures.h"
 #include <stdlib.h>
+#include <string.h>
 #include <curl/curl.h>
 
 void test()
 {
+    const char *filename = "./src/versioning/tasks_history.log";
+    Task *task = initializeTask();
+    setNameOfTask(task, "My task name");
+    setNameOfAction(task, "My action name");
+    insertContentInFile(filename, task->firstAction->name, task->name);
+    printf("content inserted success.\n");
+    // struct tm *now = NULL;
+    // char *time = actualTimeToString(&now, "%d/%m/%Y à %X");
+    // if (time == NULL)
+    // {
+    //     printf("An error occured to transform actual time to string.\n");
+    //     return;
+    // }
+    // printf("%s\n", time);
+    // char *timeModified = timeToString(now, "%d-%m-%Y %X");
+    // if (timeModified == NULL)
+    // {
+    //     printf("An error occured to modify time an transform to string.\n");
+    //     return;
+    // }
+    // printf("%s\n", timeModified);
 
-    struct tm *now = NULL;
-    char *time = actualTimeToString(&now, "%d/%m/%Y à %X");
-    if (time == NULL) 
-    {
-        printf("An error occured to transform actual time to string.\n");
-        return;
-    }
-    printf("%s\n", time);
-    char *timeModified = timeToString(now, "%d-%m-%Y %X");
-    if (timeModified == NULL) 
-    {
-        printf("An error occured to modify time an transform to string.\n");
-        return;
-    }
-    printf("%s\n", timeModified);
-
-    free(time);
-    free(timeModified);
+    // free(time);
+    // free(timeModified);
     // EXAMPLE OF CURL REQUEST
     //
     // CURLcode res;
@@ -44,6 +50,32 @@ void test()
     //     printf("\nnew file created\n");
     // }
     // fclose(fp);
+}
+
+void runAllTasks(TaskList *tasksList)
+{
+    Task *startTask = tasksList->firstTask;
+    while (startTask != NULL)
+    {
+        Action *startAction = startTask->firstAction;
+        while (startAction != NULL)
+        {
+            Option *startOption = startAction->firstOption;
+            while(startOption != NULL)
+            {
+                if(strcmp(startOption->key, "versioning") == 0 &&
+                strcmp(startOption->value, "on") == 0)
+                {
+                    insertContentInFile("./src/versioning/tasks_history.log", startAction->name, startTask->name);
+                    printf("\ncontent inserted success.\n");
+                    break;
+                }
+                startOption = startOption->next;
+            }
+            startAction = startAction->next;
+        }
+        startTask = startTask->next;
+    }
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
@@ -76,4 +108,19 @@ char *timeToString(struct tm *time, const char *format)
     if (error == 0)
         return NULL;
     return buffer;
+}
+
+void insertContentInFile(const char *filename, const char *actionName, const char *taskName)
+{
+    FILE *file = fopen(filename, "a+");
+    if (file == NULL)
+    {
+        printf("File does not exit in path given.\n");
+        return;
+    }
+    struct tm *now = NULL;
+    char *nowDateTime = actualTimeToString(&now, "%d-%m-%Y %X");
+    fprintf(file, "Action: %s\nExecuted by: %s\nDate: %s\n\n", actionName, taskName, nowDateTime);
+    free(nowDateTime);
+    fclose(file);
 }

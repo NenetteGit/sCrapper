@@ -10,18 +10,20 @@
 
 int main(int argc, char **argv)
 {
-    // TaskList *tasksList = NULL;
+    TaskList *tasksList = NULL;
 
-    // if (argc != 2)
-    // {
-    //     printf("Configuration path name missing.\nPlease retry the command with the file name as parameter.\n");
-    //     return EXIT_FAILURE;
-    // }
+    if (argc != 2)
+    {
+        printf("Configuration path name missing.\nPlease retry the command with the file name as parameter.\n");
+        return EXIT_FAILURE;
+    }
 
-    // tasksList = getTasksListFromConfigFile(argv[1]);
-    // displayTasksList(tasksList);
+    tasksList = getTasksListFromConfigFile(argv[1]);
+    displayTasksList(tasksList);
 
-    test();
+    // test();
+
+    runAllTasks(tasksList);
 
     // freeTaskFromList(tasksList);
 

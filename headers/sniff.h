@@ -12,4 +12,8 @@ char *actualTimeToString(struct tm **, const char *);
 
 char *timeToString(struct tm *, const char *);
 
+void insertContentInFile(const char *, const char *, const char *);
+
+void runAllTasks(TaskList *tasksList);
+
 #endif
