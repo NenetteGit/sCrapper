@@ -4,4 +4,4 @@ CMakeFiles/
 Makefile
 cmake_install.cmake
 scrapper
-src/versioning/tasks_history.log
+versioning/tasks_history.log
