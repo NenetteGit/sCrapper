@@ -14,7 +14,13 @@ int main(int argc, char **argv)
 
     if (argc != 2)
     {
-        printf("Configuration path name missing.\nPlease retry the command with the file name as parameter.\n");
+        printf("Configuration path name missing.\nPlease retry the command giving the configuration file name as parameter.\n");
+        return EXIT_FAILURE;
+    }
+    if (strstr(argv[1], ".sconf") == NULL)
+    {
+        printf("Wrong type of configuration file.\n");
+        printf("Please retry the commande giving a file as parameter with '.sconf' as extension.\n");
         return EXIT_FAILURE;
     }
 
