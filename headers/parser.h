@@ -1,8 +1,13 @@
-#ifndef STRUCTURES_H
-#define STRUCTURES_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <stdio.h>
 #include <ctype.h>
+
+typedef struct Option Option;
+typedef struct Action Action;
+typedef struct Task Task;
+typedef struct TaskList TaskList;
 
 enum symbol
 {
@@ -17,11 +22,6 @@ enum symbol
     NEW_ACTION,
     NEW_TASK
 };
-
-typedef struct Option Option;
-typedef struct Action Action;
-typedef struct Task Task;
-typedef struct TaskList TaskList;
 
 struct Option
 {

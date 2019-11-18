@@ -1,12 +1,8 @@
-#include <pthread.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <stdlib.h>
-#include <curl/curl.h>
 #include <string.h>
-#include <unistd.h>
-#include "headers/structures.h"
-#include "headers/sniff.h"
+#include "headers/parser.h"
+#include "headers/runner.h"
 
 int main(int argc, char **argv)
 {
@@ -25,15 +21,10 @@ int main(int argc, char **argv)
     }
 
     tasksList = getTasksListFromConfigFile(argv[1]);
-    displayTasksList(tasksList);
-
-    // test();
 
     runAllTasks(tasksList);
 
-    // freeTaskFromList(tasksList);
-
-    printf("\ntest end \n");
+    printf("\nProgram end. \n");
 
     return EXIT_SUCCESS;
 }

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stddef.h>
-#include "headers/structures.h"
+#include "headers/parser.h"
 
 void setOption(Option *option, const char *key, const char *value)
 {

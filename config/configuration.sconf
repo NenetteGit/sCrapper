@@ -21,15 +21,15 @@
 
 =
 {name -> Mon site web}  #Correspond au nom de vôtre action
-{url -> https://www.google.fr}          # URL du site à récupérer
+{url -> https://www.myges.fr}          # URL du site à récupérer
 +
-{max-depth -> 3}
+{max-depth -> 2}
 {versioning -> on}
-{type -> img/png}
+{type -> (text/html, application/json)}
 
 =
 {name -> Mon deuxième site}  # Correspond au nom de vôtre deuxième action
-{url -> https://stackoverflow.com}               # URL du site à récupérer
+{url -> https://trello.com/b/LWCkgVYL/scrapper-c}               # URL du site à récupérer
 +
 {max-depth -> 0}            # Listes des options au format { KEY -> VALUE}
 {versioning -> off}
