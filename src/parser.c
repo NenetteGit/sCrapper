@@ -474,7 +474,7 @@ TaskList *getTasksListFromConfigFile(const char *filename)
     Task *actionsList = NULL;
 
     FILE *configFile;
-
+    
     char ***temporaryListOfActionsNamePerTask = malloc(sizeof(char **) * 10);
     int *temporaryNumberOfActionPerTask = malloc(sizeof(int) * 10);
 

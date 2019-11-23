@@ -46,6 +46,7 @@ HttpResponse http_get(const char *url, char **content_type)
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
 
     curl_easy_setopt(curl, CURLINFO_RESPONSE_CODE, &response.status);
 

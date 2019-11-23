@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 
     tasksList = getTasksListFromConfigFile(argv[1]);
 
+    displayTasksList(tasksList);
+
     runAllTasks(tasksList);
 
     printf("\nProgram end. \n");
